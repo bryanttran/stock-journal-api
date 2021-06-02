@@ -37,6 +37,12 @@ provider:
         - dynamodb:DescribeTable
       Resource: "arn:aws:dynamodb:us-west-1:*:*"
 
+# Create our resources with separate CloudFormation templates
+# Returns CORS headers for 4xx and 5xx errors
+resources:
+  # API Gateway Errors
+  - ${file(resources/api-gateway-errors.yml)}
+
 functions:
   # Defines an HTTP API endpoint that calls the main function in create.js
   # - path: url path is /stock-journal
@@ -48,6 +54,7 @@ functions:
           path: stocks
           method: post
           authorizer: aws_iam
+          cors: true
   get:
     # Defines an HTTP API endpoint that calls the main function in get.js
     # - path: url path is /stocks/{id}
@@ -58,6 +65,7 @@ functions:
           path: stocks/{id}
           method: get
           authorizer: aws_iam
+          cors: true
   list:
     # Defines an HTTP API endpoint that calls the main function in list.js
     # - path: url path is /stocks
@@ -68,6 +76,7 @@ functions:
           path: stocks
           method: get
           authorizer: aws_iam
+          cors: true
   update:
     # Defines an HTTP API endpoint that calls the main function in update.js
     # - path: url path is /stocks/{id}
@@ -78,6 +87,7 @@ functions:
           path: stocks/{id}
           method: put
           authorizer: aws_iam
+          cors: true
   delete:
     # Defines an HTTP API endpoint that calls the main function in delete.js
     # - path: url path is /stocks/{id}
@@ -88,6 +98,7 @@ functions:
           path: stocks/{id}
           method: delete
           authorizer: aws_iam
+          cors: true
   billing:
     # Defines an HTTP API endpoint that calls the main function in billing.js
     # - path: url path is /billing
@@ -98,3 +109,4 @@ functions:
           path: billing
           method: post
           authorizer: aws_iam
+          cors: true
