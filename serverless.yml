@@ -16,12 +16,19 @@ provider:
   region: us-west-1
   deploymentBucket: # used to specify specific bucket for S3
     name: stock-journal-upload 
+  cloudFront:
+
 
   # These environment variables are made available to our functions
   # under process.env.
   environment:
     tableName: stock-journal
     stripeSecretKey: ${env:STRIPE_SECRET_KEY}
+    tdClientId: ${env:TD_CLIENT_ID}
+    tdRedirectUri: ${env:TD_REDIRECT_URI}
+    accessTokenHash: ${env:ACCESS_TOKEN_SECRET}
+    refreshTokenHash: ${env:REFRESH_TOKEN_SECRET}
+    userTokenTable: user-token
 
   # 'iamRoleStatements' defines the permission policy for the Lambda function.
   # In this case Lambda functions are granted with permissions to access DynamoDB.
@@ -36,6 +43,9 @@ provider:
         - dynamodb:DeleteItem
         - dynamodb:DescribeTable
       Resource: "arn:aws:dynamodb:us-west-1:*:*"
+    - Effect: Allow
+      Action: execute-api:Invoke
+      Resource: "arn:aws:execute-api:us-west-1:*:01v3itt60l/*"
 
 # Create our resources with separate CloudFormation templates
 # Returns CORS headers for 4xx and 5xx errors
@@ -108,5 +118,40 @@ functions:
       - http:
           path: billing
           method: post
+          authorizer: aws_iam
+          cors: true
+  # 
+  mergeCookies:
+    handler: mergeCookies.main
+    events:
+      - http:
+          path: mergeCookies
+          method: post
+          authorizer: aws_iam
+          cors: true
+  ##### TD API end points
+  getCodeTD:
+    handler: getCodeTD.main
+    events:
+      - http:
+          path: getCodeTD
+          method: post
+          authorizer: aws_iam
+          cors: true
+  getAcctTD:
+    handler: getAcctTD.main
+    events:
+      - http:
+          path: getAcctTD
+          method: put
+          authorizer: aws_iam
+          cors: true
+  transactionsTD:
+    handler: transactionsTD.main
+    timeout: 120 # Timeout 2 minutes for getting one year worth of past stocks
+    events:
+      - http:
+          path: transactionsTD
+          method: put
           authorizer: aws_iam
           cors: true

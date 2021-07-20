@@ -19,6 +19,9 @@
     "serverless-offline": "^7.0.0"
   },
   "dependencies": {
-    "stripe": "^8.151.0"
+    "jsonwebtoken": "^8.5.1",
+    "moment": "^2.29.1",
+    "stripe": "^8.151.0",
+    "universal-cookie": "^4.0.4"
   }
 }
